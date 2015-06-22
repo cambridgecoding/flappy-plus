@@ -13,6 +13,22 @@ var pipes;
 // the interval (in seconds) at which new pipe columns are spawned
 var pipeInterval = 1.75;
 
+// The value of gravity and speed
+var gameGravity = 200;
+var gameSpeed = 200;
+
+var bonusDuration = 10;
+var bonusRate = 6;
+var bonuses;
+
+var bgRed = 110;
+var bgGreen = 179;
+var bgBlue = 229;
+
+function bgColor() {
+    return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
+}
+
 // Loads all resources for the game and gives them names.
 function preload() {
     // make image file available to game and associate with alias playerImg
@@ -21,12 +37,13 @@ function preload() {
     game.load.audio("score", "assets/point.ogg");
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
+    game.load.image("lighter","assets/lighter.png");
 }
 
 // Initialises the game. This function is only called once.
 function create() {
     // set the background colour of the scene
-    game.stage.setBackgroundColor("#F3D3A3");
+    game.stage.setBackgroundColor(bgColor());
     // add welcome text
     game.add.text(20, 20, "Welcome to my game", {font: "30px Arial", fill: "#FFFFFF"});
     // add score text
@@ -39,14 +56,15 @@ function create() {
     // enable physics for the player sprite
     game.physics.arcade.enable(player);
     // set the player's gravity
-    player.body.gravity.y = 200;
+    player.body.gravity.y = gameGravity;
     // associate spacebar with jump function
     game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(playerJump);
     // create a group called 'pipes' to contain individual pipe elements that
     // the player can interact with
     pipes = game.add.group();
+    bonuses = game.add.group();
     // time loop for game to update
-    game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generatePipe);
+    game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
 }
 
 // This function updates the scene. It is called for every new frame.
@@ -54,6 +72,13 @@ function update() {
     // Call gameOver function when player overlaps with pipe
     // (i.e. when player hits a pipe)
     game.physics.arcade.overlap(player, pipes, gameOver);
+
+    bonuses.forEach(function(bonus){
+        game.physics.arcade.overlap(player,bonus,function(){
+            lighten();
+            bonus.destroy();
+        })
+    });
 }
 
 // Adds a pipe part to the pipes group
@@ -64,7 +89,15 @@ function addPipeBlock(x, y) {
     game.physics.arcade.enable(pipe);
     // set the pipe's horizontal velocity to a negative value
     // (negative x value for velocity means movement will be towards left)
-    pipe.body.velocity.x = -200;
+    pipe.body.velocity.x = - gameSpeed;
+}
+
+function generate(){
+    if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
+        generateBonus()
+    } else {
+        generatePipe()
+    }
 }
 
 // Generate moving pipe
@@ -83,6 +116,31 @@ function generatePipe() {
     // Increment the score each time a new pipe is generated.
     changeScore();
 }
+
+function generateBonus(){
+	var bonus = bonuses.create(750, game.rnd.integerInRange(1,5) * 80, "lighter");
+	game.physics.arcade.enable(bonus);
+    bonus.body.velocity.x = - gameSpeed;
+}
+
+function lighten() {
+	gameGravity -= 50;
+    player.body.gravity.y = gameGravity;
+    bgRed -= 40;
+    bgGreen -= 50;
+    bgBlue -= 50;
+    game.stage.setBackgroundColor(bgColor());
+
+	game.time.events.add(bonusDuration * Phaser.Timer.SECOND, function(){
+		gameGravity += 50;
+        player.body.gravity.y = gameGravity;
+        bgRed += 40;
+        bgGreen += 50;
+        bgBlue += 50;
+        game.stage.setBackgroundColor(bgColor());
+	});
+}
+
 
 function playerJump() {
     // the more negative the value the higher it jumps
