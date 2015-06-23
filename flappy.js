@@ -75,6 +75,10 @@ function update() {
     // (i.e. when player hits a pipe)
     game.physics.arcade.overlap(player, pipes, gameOver);
 
+	 if(0 > player.body.y || player.body.y > 400){
+		 gameOver();
+	 };
+
     bonuses.forEach(function(bonus){
         game.physics.arcade.overlap(player,bonus,function(){
             lighten();
