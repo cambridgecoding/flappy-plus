@@ -32,7 +32,7 @@ function bgColor() {
 // Loads all resources for the game and gives them names.
 function preload() {
     // make image file available to game and associate with alias playerImg
-    game.load.image("playerImg","assets/jamesBond.gif");
+    game.load.image("playerImg","assets/flappy-cropped.png");
     // make sound file available to game and associate with alias score
     game.load.audio("score", "assets/point.ogg");
     // make image file available to game and associate with alias pipe
@@ -50,6 +50,8 @@ function create() {
     labelScore = game.add.text(20, 60, "0", {font: "30px Arial", fill: "#FFFFFF"});
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
+	 player.anchor.setTo(0.5, 0.5);
+	 player.hitArea = Phaser.Ellipse(0,0,43,33);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -79,6 +81,8 @@ function update() {
             bonus.destroy();
         })
     });
+
+	 player.rotation = (player.body.velocity.y / gameSpeed);
 }
 
 // Adds a pipe part to the pipes group
