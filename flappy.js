@@ -133,20 +133,22 @@ function generateBonus(){
 
 function lighten() {
 	gameGravity -= 50;
-    player.body.gravity.y = gameGravity;
-    bgRed -= 40;
-    bgGreen -= 50;
-    bgBlue -= 50;
-    game.stage.setBackgroundColor(bgColor());
+	player.body.gravity.y = gameGravity;
+	bgRed -= 40;
+	bgGreen -= 50;
+	bgBlue -= 50;
+	game.stage.setBackgroundColor(bgColor());
 
-	game.time.events.add(bonusDuration * Phaser.Timer.SECOND, function(){
-		gameGravity += 50;
-        player.body.gravity.y = gameGravity;
-        bgRed += 40;
-        bgGreen += 50;
-        bgBlue += 50;
-        game.stage.setBackgroundColor(bgColor());
-	});
+	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
+}
+
+function heavier(){
+	gameGravity += 50;
+	player.body.gravity.y = gameGravity;
+	bgRed += 40;
+	bgGreen += 50;
+	bgBlue += 50;
+	game.stage.setBackgroundColor(bgColor());
 }
 
 
