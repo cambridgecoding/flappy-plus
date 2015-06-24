@@ -10,31 +10,15 @@ var labelScore;
 var player;
 // Global pipes variable declared but not initialised.
 var pipes;
-
-var modes = [
-	{name:"easy",
-		pipeInterval: 3,
-		gameSpeed: 180,
-		gameGravity: 220,
-		bonusRate: 4
-	},
-	{name:"normal",
-		pipeInterval: 1.75,
-		gameSpeed: 200,
-		gameGravity: 200,
-		bonusRate: 10
-	}
-];
-
 // the interval (in seconds) at which new pipe columns are spawned
-var pipeInterval;
+var pipeInterval = 1.75;
 
 // The value of gravity and speed
-var gameGravity;
-var gameSpeed;
+var gameGravity = 200;
+var gameSpeed = 200;
 
 var bonusDuration = 10;
-var bonusRate;
+var bonusRate = 5;
 var bonuses;
 
 var bgRed = 110;
@@ -43,18 +27,6 @@ var bgBlue = 229;
 
 function bgColor() {
     return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
-}
-
-function setMode(modeName) {
-	for(var i=0; i<modes.length; i++){
-		var mode = modes[i];
-		if(mode.name === modeName){
-			pipeInterval = mode.pipeInterval;
-			gameSpeed = mode.gameSpeed;
-			gameGravity = mode.gameGravity;
-			bonusRate = mode.bonusRate;
-		}
-	}
 }
 
 // Loads all resources for the game and gives them names.
@@ -70,9 +42,6 @@ function preload() {
 
 // Initialises the game. This function is only called once.
 function create() {
-
-	setMode("easy");
-
     // set the background colour of the scene
     game.stage.setBackgroundColor(bgColor());
     // add welcome text

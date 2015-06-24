@@ -10,31 +10,15 @@ var labelScore;
 var player;
 // Global pipes variable declared but not initialised.
 var pipes;
-
-var modes = [
-	{name:"easy",
-		pipeInterval: 3,
-		gameSpeed: 180,
-		gameGravity: 220,
-		bonusRate: 4
-	},
-	{name:"normal",
-		pipeInterval: 1.75,
-		gameSpeed: 200,
-		gameGravity: 200,
-		bonusRate: 10
-	}
-];
-
 // the interval (in seconds) at which new pipe columns are spawned
-var pipeInterval;
+var pipeInterval = 1.75;
 
 // The value of gravity and speed
-var gameGravity;
-var gameSpeed;
+var gameGravity = 200;
+var gameSpeed = 200;
 
 var bonusDuration = 10;
-var bonusRate;
+var bonusRate = 5;
 var bonuses;
 
 var bgRed = 110;
@@ -43,18 +27,6 @@ var bgBlue = 229;
 
 function bgColor() {
     return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
-}
-
-function setMode(modeName) {
-	for(var i=0; i<modes.length; i++){
-		var mode = modes[i];
-		if(mode.name === modeName){
-			pipeInterval = mode.pipeInterval;
-			gameSpeed = mode.gameSpeed;
-			gameGravity = mode.gameGravity;
-			bonusRate = mode.bonusRate;
-		}
-	}
 }
 
 // Loads all resources for the game and gives them names.
@@ -66,13 +38,11 @@ function preload() {
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
     game.load.image("lighter","assets/lighter.png");
+	game.load.image("star","assets/star.png");
 }
 
 // Initialises the game. This function is only called once.
 function create() {
-
-	setMode("easy");
-
     // set the background colour of the scene
     game.stage.setBackgroundColor(bgColor());
     // add welcome text
@@ -96,6 +66,7 @@ function create() {
     // the player can interact with
     pipes = game.add.group();
     bonuses = game.add.group();
+    stars = game.add.group();
     // time loop for game to update
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
 }
@@ -112,10 +83,17 @@ function update() {
 
     bonuses.forEach(function(bonus){
         game.physics.arcade.overlap(player,bonus,function(){
-            lighten();
             bonus.destroy();
+            lighten();
         })
     });
+
+	stars.forEach(function(star){
+        game.physics.arcade.overlap(player,star,function(){
+            star.destroy();
+            changeScore();
+        })
+	});
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
 }
@@ -129,6 +107,12 @@ function addPipeBlock(x, y) {
     // set the pipe's horizontal velocity to a negative value
     // (negative x value for velocity means movement will be towards left)
     pipe.body.velocity.x = - gameSpeed;
+}
+
+function addStar(x,y) {
+	var star = stars.create(x,y,"star");
+	game.physics.arcade.enable(star);
+	star.body.velocity.x = - gameSpeed;
 }
 
 function generate(){
@@ -152,8 +136,7 @@ function generatePipe() {
             addPipeBlock(750, count * 50);
         }
     }
-    // Increment the score each time a new pipe is generated.
-    changeScore();
+	addStar(750,gapStart * 50 + 26);
 }
 
 function generateBonus(){
