@@ -25,6 +25,8 @@ var modes = [
 		bonusRate: 10
 	}
 ];
+var easyTag;
+var normalTag;
 
 // the interval (in seconds) at which new pipe columns are spawned
 var pipeInterval;
@@ -66,6 +68,8 @@ function preload() {
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
     game.load.image("lighter","assets/lighter.png");
+    game.load.image("Easy","assets/easy.png");
+    game.load.image("Normal","assets/normal.png");
 }
 
 // Initialises the game. This function is only called once.
@@ -96,8 +100,13 @@ function create() {
     // the player can interact with
     pipes = game.add.group();
     bonuses = game.add.group();
-    // time loop for game to update
-    game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
+
+    easyTag = game.add.sprite(350, 100,"Easy");
+    game.physics.arcade.enable(easyTag);
+    easyTag.body.velocity.x = - gameSpeed;
+    normalTag = game.add.sprite(350, 300,"Normal");
+    game.physics.arcade.enable(normalTag);
+    normalTag.body.velocity.x = - gameSpeed;
 }
 
 // This function updates the scene. It is called for every new frame.
@@ -118,6 +127,21 @@ function update() {
     });
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
+
+    game.physics.arcade.overlap(player,easyTag, function(){
+        easyTag.destroy();
+        normalTag.destroy();
+        setMode("easy");
+        // time loop for game to update
+        game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
+    });
+    game.physics.arcade.overlap(player,normalTag, function(){
+        easyTag.destroy();
+        normalTag.destroy();
+        setMode("normal");
+       // time loop for game to update
+       game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
+    });
 }
 
 // Adds a pipe part to the pipes group
