@@ -11,6 +11,8 @@ var player;
 // Global pipes variable declared but not initialised.
 var pipes;
 
+//RGU: could we simplify this to {"easy": {...}, "normal": {...}}?
+// implementation of setMode becomes simpler too
 var modes = [
 	{name:"easy",
 		pipeInterval: 3,
@@ -47,6 +49,7 @@ function bgColor() {
     return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
 }
 
+//RGU: see comment above
 function setMode(modeName) {
 	for(var i=0; i<modes.length; i++){
 		var mode = modes[i];
@@ -118,7 +121,7 @@ function update() {
 	 if(0 > player.body.y || player.body.y > 400){
 		 gameOver();
 	 }
-
+    // RGU: see comment in previous modules about this
     bonuses.forEach(function(bonus){
         game.physics.arcade.overlap(player,bonus,function(){
             lighten();
@@ -128,6 +131,10 @@ function update() {
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
 
+    //RGU: I think this can be cool
+    // problem if you miss a label at the start you don't get the game
+    // I think we should offer a normal starting menu where they click and then the game starts
+    // like on the game at http://flappybird.cambridgecoding.com/
     game.physics.arcade.overlap(player,easyTag, function(){
         easyTag.destroy();
         normalTag.destroy();

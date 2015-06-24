@@ -66,6 +66,7 @@ function create() {
     // the player can interact with
     pipes = game.add.group();
     bonuses = game.add.group();
+    //RGU: stars is not declared at the top of the file
     stars = game.add.group();
     // time loop for game to update
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
@@ -87,7 +88,7 @@ function update() {
             lighten();
         })
     });
-
+    //RGU: see comment in previous module about this
 	stars.forEach(function(star){
         game.physics.arcade.overlap(player,star,function(){
             star.destroy();

@@ -170,11 +170,14 @@ function generate(){
 }
 
 // Generate moving pipe
+// RGU: this is just a way of getting more variance in the pipes?
 function generatePipe() {
     // Generate  random integer between 1 and 5. This is the location of the
     // start point of the gap.
     var gapStart = game.rnd.integerInRange(50, height - 50 - pipeGap);
     var y = gapStart;
+
+    // RGU: previous modules use for loop
     while(y>0){
         y -= 50;
         addPipeBlock(width,y);

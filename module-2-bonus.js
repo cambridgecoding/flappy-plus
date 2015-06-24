@@ -51,6 +51,7 @@ function create() {
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
 	 player.anchor.setTo(0.5, 0.5);
+    //RGU: what is hitArea used for?
 	 player.hitArea = Phaser.Ellipse(0,0,43,33);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
@@ -79,6 +80,10 @@ function update() {
 		 gameOver();
 	 }
 
+    //RGU: nested call backs :-(
+    // can we do bonuses.forEach(setUpBonus) or similar?
+    // e.g. the overlap above takes gameOver function
+    // will have to explain that forEach only wors with Group
     bonuses.forEach(function(bonus){
         game.physics.arcade.overlap(player,bonus,function(){
             lighten();
@@ -168,5 +173,8 @@ function changeScore() {
 function gameOver() {
     // stop the game (update() function no longer called)
     score = 0;
+    // RGU: interestingly the state of bonuses carries through
+    // this way because the global variables are not reset
+    // location.reload() will force a complete new state
     game.state.restart();
 }
