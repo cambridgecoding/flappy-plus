@@ -51,8 +51,6 @@ function create() {
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
 	 player.anchor.setTo(0.5, 0.5);
-    //RGU: what is hitArea used for?
-	 player.hitArea = Phaser.Ellipse(0,0,43,33);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -84,15 +82,23 @@ function update() {
     // can we do bonuses.forEach(setUpBonus) or similar?
     // e.g. the overlap above takes gameOver function
     // will have to explain that forEach only wors with Group
-    bonuses.forEach(function(bonus){
-        game.physics.arcade.overlap(player,bonus,function(){
-            lighten();
-            bonus.destroy();
-        })
-    });
+	 //RP: I rewrote it without hte callback. I think the new challenge now is
+	 //to understand why there's an argument in testBonus. (The other callbacks
+	 //have no argument so far.)
+	 //RP: Also, no one would write javascript like that. I think they need to
+	 //learn about anonymous functions. I can make it a non-nested callback.
+    bonuses.forEach(testBonus);
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
 }
+
+function testBonus(bonus) {
+	if(bonus.overlap(player)){
+		lighten();
+		bonus.destroy();
+	}
+}
+
 
 // Adds a pipe part to the pipes group
 function addPipeBlock(x, y) {
@@ -176,5 +182,7 @@ function gameOver() {
     // RGU: interestingly the state of bonuses carries through
     // this way because the global variables are not reset
     // location.reload() will force a complete new state
+	 //RP: yes, This problem disappears with the difficulty settings though.
+	 //We could reset all the variables manually (just like score).
     game.state.restart();
 }

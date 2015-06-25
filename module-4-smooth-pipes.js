@@ -73,6 +73,7 @@ function preload() {
     game.load.audio("score", "assets/point.ogg");
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
+    game.load.image("pipeEnd","assets/pipe-end.png");
     game.load.image("lighter","assets/lighter.png");
     game.load.image("Easy","assets/easy.png");
     game.load.image("Normal","assets/normal.png");
@@ -160,6 +161,11 @@ function addPipeBlock(x, y) {
     // (negative x value for velocity means movement will be towards left)
     pipe.body.velocity.x = - gameSpeed;
 }
+function addPipeEnd(x, y) {
+    var pipe = pipes.create(x, y, "pipeEnd");
+    game.physics.arcade.enable(pipe);
+    pipe.body.velocity.x = - gameSpeed;
+}
 
 function generate(){
     if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
@@ -171,21 +177,20 @@ function generate(){
 
 // Generate moving pipe
 // RGU: this is just a way of getting more variance in the pipes?
+//RP: yes. Also it makes it less predictible and it offers the possiblility of
+//bigger and narrower pipes with small incremements/decrememnts
 function generatePipe() {
     // Generate  random integer between 1 and 5. This is the location of the
     // start point of the gap.
     var gapStart = game.rnd.integerInRange(50, height - 50 - pipeGap);
-    var y = gapStart;
 
-    // RGU: previous modules use for loop
-    while(y>0){
-        y -= 50;
+	 addPipeEnd(width,gapStart);
+	 for(var y=gapStart - 25; y>0; y -= 50){
         addPipeBlock(width,y);
     }
-    y = gapStart + pipeGap;
-    while(y<height){
+	 addPipeEnd(width,gapStart+pipeGap);
+	 for(var y=gapStart + pipeGap + 25; y<height; y += 50){
         addPipeBlock(width,y);
-        y+=50
     }
     // Increment the score each time a new pipe is generated.
     changeScore();

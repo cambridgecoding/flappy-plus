@@ -11,16 +11,14 @@ var player;
 // Global pipes variable declared but not initialised.
 var pipes;
 
-//RGU: could we simplify this to {"easy": {...}, "normal": {...}}?
-// implementation of setMode becomes simpler too
 var modes = [
-	{name:"easy",
+	easy: {
 		pipeInterval: 3,
 		gameSpeed: 180,
 		gameGravity: 220,
 		bonusRate: 4
 	},
-	{name:"normal",
+	normal: {
 		pipeInterval: 1.75,
 		gameSpeed: 200,
 		gameGravity: 200,
@@ -49,17 +47,15 @@ function bgColor() {
     return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
 }
 
-//RGU: see comment above
 function setMode(modeName) {
-	for(var i=0; i<modes.length; i++){
-		var mode = modes[i];
-		if(mode.name === modeName){
-			pipeInterval = mode.pipeInterval;
-			gameSpeed = mode.gameSpeed;
-			gameGravity = mode.gameGravity;
-			bonusRate = mode.bonusRate;
-		}
-	}
+	var mode;
+	if(modeName = "easy"){ mode = modes.easy; }
+	if(modeName = "normal"){ mode = modes.normal; }
+
+	pipeInterval = mode.pipeInterval;
+	gameSpeed = mode.gameSpeed;
+	gameGravity = mode.gameGravity;
+	bonusRate = mode.bonusRate;
 }
 
 // Loads all resources for the game and gives them names.
@@ -122,11 +118,13 @@ function update() {
 		 gameOver();
 	 }
     // RGU: see comment in previous modules about this
+	 //RP: Here's a version with non-nested callbacks. I think it's idiomatic
+	 //JS and interesting for them to learn.
     bonuses.forEach(function(bonus){
-        game.physics.arcade.overlap(player,bonus,function(){
+        if(bonus.overlap(player)){
             lighten();
             bonus.destroy();
-        })
+        }
     });
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
@@ -135,6 +133,13 @@ function update() {
     // problem if you miss a label at the start you don't get the game
     // I think we should offer a normal starting menu where they click and then the game starts
     // like on the game at http://flappybird.cambridgecoding.com/
+	 //RP: I tried to get as unobtrusive as possible. I considered the
+	 //following alternative: do it the standard Phaser way by extending the
+	 //Game.Stage prototype (a bit overkill and quite complicated), do it
+	 //hackily (like the page on cca) but that introduces a lot of functions
+	 //and intermediate things, this simple thing where the menu is in the
+	 //game.
+	 //Maybe we can have the full menu as a bonus?
     game.physics.arcade.overlap(player,easyTag, function(){
         easyTag.destroy();
         normalTag.destroy();

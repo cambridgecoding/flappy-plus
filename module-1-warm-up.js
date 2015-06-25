@@ -34,8 +34,6 @@ function create() {
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
 	 player.anchor.setTo(0.5, 0.5);
-    //RGU: what is hitArea?
-	 player.hitArea = Phaser.Ellipse(0,0,43,33);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -66,6 +64,7 @@ function update() {
 	player.rotation = (player.body.velocity.y / gameSpeed);
 }
 
+
 // Adds a pipe part to the pipes group
 function addPipeBlock(x, y) {
     // add a new pipe part to the 'pipes' group
@@ -83,6 +82,7 @@ function generatePipe() {
     //RGU: as a bonus could we get them to have nicer pipes that have a "start" and "end"?
     // like in the real flappy bird game ---] [---
     // see http://flappybird.cambridgecoding.com/
+	 //RP: That'd be better suited with the smooth-pipe module
 
     // Generate  random integer between 1 and 5. This is the location of the
     // start point of the gap.
