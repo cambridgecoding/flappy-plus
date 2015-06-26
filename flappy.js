@@ -13,22 +13,22 @@ var player;
 // Global pipes variable declared but not initialised.
 var pipes;
 
-var modes = [
-	{name:"easy",
+var modes = {
+	easy: {
 		pipeInterval: 3,
 		gameSpeed: 180,
 		gameGravity: 220,
 		bonusRate: 4,
         pipeGap: 150
 	},
-	{name:"normal",
+	normal: {
 		pipeInterval: 1.75,
 		gameSpeed: 200,
 		gameGravity: 200,
 		bonusRate: 10,
         pipeGap: 100
 	}
-];
+};
 var easyTag;
 var normalTag;
 
@@ -42,7 +42,8 @@ var gameSpeed;
 
 var bonusDuration = 10;
 var bonusRate;
-var bonuses;
+var baloons;
+var weights;
 
 var bgRed = 110;
 var bgGreen = 179;
@@ -52,17 +53,12 @@ function bgColor() {
     return Phaser.Color.RGBtoString(bgRed, bgGreen, bgBlue, 255, '#');
 }
 
-function setMode(modeName) {
-	for(var i=0; i<modes.length; i++){
-		var mode = modes[i];
-		if(mode.name === modeName){
-			pipeInterval = mode.pipeInterval;
-			gameSpeed = mode.gameSpeed;
-			gameGravity = mode.gameGravity;
-			bonusRate = mode.bonusRate;
-            pipeGap = mode.pipeGap;
-		}
-	}
+function setMode(mode) {
+	pipeInterval = mode.pipeInterval;
+	gameSpeed = mode.gameSpeed;
+	gameGravity = mode.gameGravity;
+	bonusRate = mode.bonusRate;
+	pipeGap = mode.pipeGap;
 }
 
 // Loads all resources for the game and gives them names.
@@ -74,7 +70,8 @@ function preload() {
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
     game.load.image("pipeEnd","assets/pipe-end.png");
-    game.load.image("lighter","assets/lighter.png");
+    game.load.image("baloons","assets/baloons.png");
+    game.load.image("weight","assets/weight.png");
     game.load.image("Easy","assets/easy.png");
     game.load.image("Normal","assets/normal.png");
 }
@@ -82,7 +79,7 @@ function preload() {
 // Initialises the game. This function is only called once.
 function create() {
 
-	setMode("easy");
+	setMode(modes.easy);
 
     // set the background colour of the scene
     game.stage.setBackgroundColor(bgColor());
@@ -93,7 +90,6 @@ function create() {
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
 	 player.anchor.setTo(0.5, 0.5);
-	 player.hitArea = Phaser.Ellipse(0,0,43,33);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -106,7 +102,8 @@ function create() {
     // create a group called 'pipes' to contain individual pipe elements that
     // the player can interact with
     pipes = game.add.group();
-    bonuses = game.add.group();
+    baloons = game.add.group();
+    weights = game.add.group();
 
     easyTag = game.add.sprite(width/2, height/4,"Easy");
     game.physics.arcade.enable(easyTag);
@@ -126,10 +123,16 @@ function update() {
 		 gameOver();
 	 }
 
-    bonuses.forEach(function(bonus){
-        game.physics.arcade.overlap(player,bonus,function(){
-            lighten();
+    baloons.forEach(function(bonus){
+        game.physics.arcade.overlap(bonus,player,function(){
             bonus.destroy();
+            lighten();
+        })
+    });
+    weights.forEach(function(bonus){
+        game.physics.arcade.overlap(bonus,player,function(){
+            bonus.destroy();
+            heavier();
         })
     });
 
@@ -138,14 +141,14 @@ function update() {
     game.physics.arcade.overlap(player,easyTag, function(){
         easyTag.destroy();
         normalTag.destroy();
-        setMode("easy");
+        setMode(modes.easy);
         // time loop for game to update
         game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
     });
     game.physics.arcade.overlap(player,normalTag, function(){
         easyTag.destroy();
         normalTag.destroy();
-        setMode("normal");
+        setMode(modes.normal);
        // time loop for game to update
        game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
     });
@@ -184,8 +187,8 @@ function generatePipe() {
     // start point of the gap.
     var gapStart = game.rnd.integerInRange(50, height - 50 - pipeGap);
 
-	 addPipeEnd(width-5,gapStart);
-	 for(var y=gapStart - 50; y>-50; y -= 50){
+	 addPipeEnd(width-5,gapStart - 25);
+	 for(var y=gapStart - 75; y>-50; y -= 50){
         addPipeBlock(width,y);
     }
 	 addPipeEnd(width-5,gapStart+pipeGap);
@@ -197,28 +200,36 @@ function generatePipe() {
 }
 
 function generateBonus(){
-	var bonus = bonuses.create(width, game.rnd.integerInRange(1,5) * 80, "lighter");
-	game.physics.arcade.enable(bonus);
-    bonus.body.velocity.x = - gameSpeed;
+	var ySpeed = gameSpeed / (2 + Math.random());
+	if(Math.random() > .5){
+		var bonus = baloons.create(750, 400, "baloons");
+		game.physics.arcade.enable(bonus);
+		bonus.body.velocity.x = - gameSpeed;
+		bonus.body.velocity.y = - ySpeed;
+	} else {
+		var bonus = weights.create(750, -50, "weight");
+		game.physics.arcade.enable(bonus);
+		bonus.body.velocity.x = - gameSpeed;
+		bonus.body.velocity.y = ySpeed;
+	}
+
 }
 
 function lighten() {
 	gameGravity -= 50;
 	player.body.gravity.y = gameGravity;
-	bgRed -= 40;
-	bgGreen -= 50;
-	bgBlue -= 50;
+	bgRed += 10;
+	bgGreen += 10;
+	bgBlue += 10;
 	game.stage.setBackgroundColor(bgColor());
-
-	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
 }
 
 function heavier(){
 	gameGravity += 50;
 	player.body.gravity.y = gameGravity;
-	bgRed += 40;
-	bgGreen += 50;
-	bgBlue += 50;
+	bgRed -= 10;
+	bgGreen -= 10;
+	bgBlue -= 10;
 	game.stage.setBackgroundColor(bgColor());
 }
 
@@ -239,5 +250,6 @@ function changeScore() {
 function gameOver() {
     // stop the game (update() function no longer called)
     score = 0;
+	 setMode(modes.easy);
     game.state.restart();
 }

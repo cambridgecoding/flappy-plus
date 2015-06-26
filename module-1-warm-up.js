@@ -60,8 +60,7 @@ function update() {
 		gameOver();
 	}
 
-    // looks like gameSpeed is not defined in this file
-	player.rotation = (player.body.velocity.y / gameSpeed);
+	player.rotation = (player.body.velocity.y / 200);
 }
 
 

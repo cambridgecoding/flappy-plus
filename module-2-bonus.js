@@ -19,7 +19,8 @@ var gameSpeed = 200;
 
 var bonusDuration = 10;
 var bonusRate = 5;
-var bonuses;
+var baloons;
+var weights;
 
 var bgRed = 110;
 var bgGreen = 179;
@@ -37,7 +38,8 @@ function preload() {
     game.load.audio("score", "assets/point.ogg");
     // make image file available to game and associate with alias pipe
     game.load.image("pipe","assets/pipe.png");
-    game.load.image("lighter","assets/lighter.png");
+    game.load.image("baloons","assets/baloons.png");
+    game.load.image("weight","assets/weight.png");
 }
 
 // Initialises the game. This function is only called once.
@@ -63,7 +65,8 @@ function create() {
     // create a group called 'pipes' to contain individual pipe elements that
     // the player can interact with
     pipes = game.add.group();
-    bonuses = game.add.group();
+    baloons = game.add.group();
+    weights = game.add.group();
     // time loop for game to update
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
 }
@@ -87,18 +90,21 @@ function update() {
 	 //have no argument so far.)
 	 //RP: Also, no one would write javascript like that. I think they need to
 	 //learn about anonymous functions. I can make it a non-nested callback.
-    bonuses.forEach(testBonus);
+    baloons.forEach(function(bonus){
+        game.physics.arcade.overlap(bonus,player,function(){
+            bonus.destroy();
+            lighten();
+        })
+    });
+    weights.forEach(function(bonus){
+        game.physics.arcade.overlap(bonus,player,function(){
+            bonus.destroy();
+            heavier();
+        })
+    });
 
 	 player.rotation = (player.body.velocity.y / gameSpeed);
 }
-
-function testBonus(bonus) {
-	if(bonus.overlap(player)){
-		lighten();
-		bonus.destroy();
-	}
-}
-
 
 // Adds a pipe part to the pipes group
 function addPipeBlock(x, y) {
@@ -137,28 +143,36 @@ function generatePipe() {
 }
 
 function generateBonus(){
-	var bonus = bonuses.create(750, game.rnd.integerInRange(1,5) * 80, "lighter");
-	game.physics.arcade.enable(bonus);
-    bonus.body.velocity.x = - gameSpeed;
+	var ySpeed = gameSpeed / (2 + Math.random());
+	if(Math.random() > .5){
+		var bonus = baloons.create(750, 400, "baloons");
+		game.physics.arcade.enable(bonus);
+		bonus.body.velocity.x = - gameSpeed;
+		bonus.body.velocity.y = - ySpeed;
+	} else {
+		var bonus = weights.create(750, -50, "weight");
+		game.physics.arcade.enable(bonus);
+		bonus.body.velocity.x = - gameSpeed;
+		bonus.body.velocity.y = ySpeed;
+	}
+
 }
 
 function lighten() {
 	gameGravity -= 50;
 	player.body.gravity.y = gameGravity;
-	bgRed -= 40;
-	bgGreen -= 50;
-	bgBlue -= 50;
+	bgRed += 10;
+	bgGreen += 10;
+	bgBlue += 10;
 	game.stage.setBackgroundColor(bgColor());
-
-	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
 }
 
 function heavier(){
 	gameGravity += 50;
 	player.body.gravity.y = gameGravity;
-	bgRed += 40;
-	bgGreen += 50;
-	bgBlue += 50;
+	bgRed -= 10;
+	bgGreen -= 10;
+	bgBlue -= 10;
 	game.stage.setBackgroundColor(bgColor());
 }
 
@@ -179,10 +193,9 @@ function changeScore() {
 function gameOver() {
     // stop the game (update() function no longer called)
     score = 0;
-    // RGU: interestingly the state of bonuses carries through
-    // this way because the global variables are not reset
-    // location.reload() will force a complete new state
-	 //RP: yes, This problem disappears with the difficulty settings though.
-	 //We could reset all the variables manually (just like score).
+    gameGravity = 200;
+    bgRed = 110;
+    bgGreen = 179;
+    bgBlue = 229;
     game.state.restart();
 }
