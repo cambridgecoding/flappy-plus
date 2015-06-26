@@ -81,15 +81,6 @@ function update() {
 		 gameOver();
 	 }
 
-    //RGU: nested call backs :-(
-    // can we do bonuses.forEach(setUpBonus) or similar?
-    // e.g. the overlap above takes gameOver function
-    // will have to explain that forEach only wors with Group
-	 //RP: I rewrote it without hte callback. I think the new challenge now is
-	 //to understand why there's an argument in testBonus. (The other callbacks
-	 //have no argument so far.)
-	 //RP: Also, no one would write javascript like that. I think they need to
-	 //learn about anonymous functions. I can make it a non-nested callback.
     baloons.forEach(function(bonus){
         game.physics.arcade.overlap(bonus,player,function(){
             bonus.destroy();
@@ -103,7 +94,7 @@ function update() {
         })
     });
 
-	 player.rotation = (player.body.velocity.y / gameSpeed);
+	player.rotation = player.body.velocity.y / gameSpeed;
 }
 
 // Adds a pipe part to the pipes group
@@ -118,7 +109,7 @@ function addPipeBlock(x, y) {
 }
 
 function generate(){
-    if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
+    if(game.rnd.integerInRange(1, bonusRate) == bonusRate){
         generateBonus()
     } else {
         generatePipe()

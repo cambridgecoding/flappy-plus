@@ -88,7 +88,8 @@ function update() {
         game.physics.arcade.overlap(bonus,player,function(){
             bonus.destroy();
             lighten();
-        })
+            bonus.destroy();
+        }
     });
     weights.forEach(function(bonus){
         game.physics.arcade.overlap(bonus,player,function(){
@@ -101,9 +102,19 @@ function update() {
             star.destroy();
             changeScore();
         })
-	});
+    });
+    //RGU: this won't work because as soon as destroy stars is undefined
+    // I suspect it's same story for bonuses above
+    //stars.forEach(function(star) {
+    //    console.log(star);
+    //    if(star.overlap(player)) {
+    //        star.destroy();
+    //        changeScore();
+    //    }
+    //});
 
-	 player.rotation = (player.body.velocity.y / gameSpeed);
+
+	 player.rotation = player.body.velocity.y / gameSpeed;
 }
 
 // Adds a pipe part to the pipes group
@@ -118,12 +129,12 @@ function addPipeBlock(x, y) {
 }
 
 function addStar(x,y) {
-	var star = stars.create(x,y,"star");
+	var star = stars.create(x, y, "star");
 	game.physics.arcade.enable(star);
 	star.body.velocity.x = - gameSpeed;
 }
 
-function generate(){
+function generate() {
     if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
         generateBonus()
     } else {
@@ -144,7 +155,7 @@ function generatePipe() {
             addPipeBlock(750, count * 50);
         }
     }
-	addStar(750,gapStart * 50 + 26);
+	addStar(750, gapStart * 50 + 26);
 }
 
 function generateBonus(){
@@ -172,7 +183,7 @@ function lighten() {
 	game.stage.setBackgroundColor(bgColor());
 }
 
-function heavier(){
+function heavier() {
 	gameGravity += 50;
 	player.body.gravity.y = gameGravity;
 	bgRed -= 10;
