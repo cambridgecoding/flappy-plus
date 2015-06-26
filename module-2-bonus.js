@@ -87,9 +87,21 @@ function update() {
 	 //have no argument so far.)
 	 //RP: Also, no one would write javascript like that. I think they need to
 	 //learn about anonymous functions. I can make it a non-nested callback.
+    // RGU: I'm ok if it's a non nested callback so this would be ok (perhaps we can/should show/explain both actually)
+    /*
+     bonuses.forEach(function(bonus) {
+         if(bonus.overlap(player)){
+             lighten();
+             bonus.destroy();
+         }
+     });
+
+
+     */
+
     bonuses.forEach(testBonus);
 
-	 player.rotation = (player.body.velocity.y / gameSpeed);
+	player.rotation = player.body.velocity.y / gameSpeed;
 }
 
 function testBonus(bonus) {
@@ -112,7 +124,7 @@ function addPipeBlock(x, y) {
 }
 
 function generate(){
-    if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
+    if(game.rnd.integerInRange(1, bonusRate) == bonusRate){
         generateBonus()
     } else {
         generatePipe()
@@ -150,7 +162,7 @@ function lighten() {
 	bgBlue -= 50;
 	game.stage.setBackgroundColor(bgColor());
 
-	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
+	game.time.events.add(bonusDuration * Phaser.Timer.SECOND, heavier);
 }
 
 function heavier(){
@@ -184,5 +196,6 @@ function gameOver() {
     // location.reload() will force a complete new state
 	 //RP: yes, This problem disappears with the difficulty settings though.
 	 //We could reset all the variables manually (just like score).
+    // RGU: the more funny thing is
     game.state.restart();
 }

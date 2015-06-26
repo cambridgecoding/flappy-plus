@@ -140,14 +140,14 @@ function update() {
 	 //and intermediate things, this simple thing where the menu is in the
 	 //game.
 	 //Maybe we can have the full menu as a bonus?
-    game.physics.arcade.overlap(player,easyTag, function(){
+    game.physics.arcade.overlap(player, easyTag, function(){
         easyTag.destroy();
         normalTag.destroy();
         setMode("easy");
         // time loop for game to update
         game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
     });
-    game.physics.arcade.overlap(player,normalTag, function(){
+    game.physics.arcade.overlap(player, normalTag, function(){
         easyTag.destroy();
         normalTag.destroy();
         setMode("normal");
@@ -167,8 +167,8 @@ function addPipeBlock(x, y) {
     pipe.body.velocity.x = - gameSpeed;
 }
 
-function generate(){
-    if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
+function generate() {
+    if(game.rnd.integerInRange(1, bonusRate) == bonusRate){
         generateBonus()
     } else {
         generatePipe()
@@ -192,7 +192,7 @@ function generatePipe() {
     changeScore();
 }
 
-function generateBonus(){
+function generateBonus() {
 	var bonus = bonuses.create(750, game.rnd.integerInRange(1,5) * 80, "lighter");
 	game.physics.arcade.enable(bonus);
     bonus.body.velocity.x = - gameSpeed;
@@ -209,7 +209,7 @@ function lighten() {
 	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
 }
 
-function heavier(){
+function heavier() {
 	gameGravity += 50;
 	player.body.gravity.y = gameGravity;
 	bgRed += 40;

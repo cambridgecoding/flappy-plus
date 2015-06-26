@@ -12,6 +12,8 @@ var player;
 var pipes;
 // the interval (in seconds) at which new pipe columns are spawned
 var pipeInterval = 1.75;
+//RGU: added
+var gameSpeed = 200;
 
 // Loads all resources for the game and gives them names.
 function preload() {

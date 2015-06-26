@@ -185,12 +185,12 @@ function generatePipe() {
     var gapStart = game.rnd.integerInRange(50, height - 50 - pipeGap);
 
 	 addPipeEnd(width,gapStart);
-	 for(var y=gapStart - 25; y>0; y -= 50){
-        addPipeBlock(width,y);
+	 for(var y = gapStart - 25; y > 0; y -= 50){
+        addPipeBlock(width, y);
     }
 	 addPipeEnd(width,gapStart+pipeGap);
-	 for(var y=gapStart + pipeGap + 25; y<height; y += 50){
-        addPipeBlock(width,y);
+	 for(var y = gapStart + pipeGap + 25; y < height; y += 50){
+        addPipeBlock(width, y);
     }
     // Increment the score each time a new pipe is generated.
     changeScore();

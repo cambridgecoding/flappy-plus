@@ -20,6 +20,7 @@ var gameSpeed = 200;
 var bonusDuration = 10;
 var bonusRate = 5;
 var bonuses;
+var stars;
 
 var bgRed = 110;
 var bgGreen = 179;
@@ -66,7 +67,6 @@ function create() {
     // the player can interact with
     pipes = game.add.group();
     bonuses = game.add.group();
-    //RGU: stars is not declared at the top of the file
     stars = game.add.group();
     // time loop for game to update
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generate);
@@ -82,21 +82,38 @@ function update() {
 		 gameOver();
 	 }
 
-    bonuses.forEach(function(bonus){
-        game.physics.arcade.overlap(player,bonus,function(){
-            bonus.destroy();
+    //bonuses.forEach(function(bonus){
+    //    game.physics.arcade.overlap(player,bonus,function(){
+    //        bonus.destroy();
+    //        lighten();
+    //    })
+    //});
+    bonuses.forEach(function(bonus) {
+        if(bonus.overlap(player)) {
             lighten();
-        })
+            bonus.destroy();
+        }
     });
+
     //RGU: see comment in previous module about this
-	stars.forEach(function(star){
+    stars.forEach(function(star){
         game.physics.arcade.overlap(player,star,function(){
             star.destroy();
             changeScore();
         })
-	});
+    });
+    //RGU: this won't work because as soon as destroy stars is undefined
+    // I suspect it's same story for bonuses above
+    //stars.forEach(function(star) {
+    //    console.log(star);
+    //    if(star.overlap(player)) {
+    //        star.destroy();
+    //        changeScore();
+    //    }
+    //});
 
-	 player.rotation = (player.body.velocity.y / gameSpeed);
+
+	 player.rotation = player.body.velocity.y / gameSpeed;
 }
 
 // Adds a pipe part to the pipes group
@@ -111,12 +128,12 @@ function addPipeBlock(x, y) {
 }
 
 function addStar(x,y) {
-	var star = stars.create(x,y,"star");
+	var star = stars.create(x, y, "star");
 	game.physics.arcade.enable(star);
 	star.body.velocity.x = - gameSpeed;
 }
 
-function generate(){
+function generate() {
     if(game.rnd.integerInRange(1,bonusRate) == bonusRate){
         generateBonus()
     } else {
@@ -137,10 +154,10 @@ function generatePipe() {
             addPipeBlock(750, count * 50);
         }
     }
-	addStar(750,gapStart * 50 + 26);
+	addStar(750, gapStart * 50 + 26);
 }
 
-function generateBonus(){
+function generateBonus() {
 	var bonus = bonuses.create(750, game.rnd.integerInRange(1,5) * 80, "lighter");
 	game.physics.arcade.enable(bonus);
     bonus.body.velocity.x = - gameSpeed;
@@ -154,10 +171,10 @@ function lighten() {
 	bgBlue -= 50;
 	game.stage.setBackgroundColor(bgColor());
 
-	game.time.events.add(bonusDuration * Phaser.Timer.SECOND,heavier);
+	game.time.events.add(bonusDuration * Phaser.Timer.SECOND, heavier);
 }
 
-function heavier(){
+function heavier() {
 	gameGravity += 50;
 	player.body.gravity.y = gameGravity;
 	bgRed += 40;
