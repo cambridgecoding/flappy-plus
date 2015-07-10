@@ -1,15 +1,22 @@
 // the functions associated with preload, create and update.
 var actions = { preload: preload, create: create, update: update };
 // the Game object used by the phaser.io library
-var game = new Phaser.Game(700, 400, Phaser.AUTO, "game", actions);
+var width = 700;
+var height = 400;
+var game = new Phaser.Game(width, height, Phaser.AUTO, "game", actions);
 // Global score variable initialised to 0.
 var score = 0;
 // Global variable to hold the text displaying the score.
 var labelScore;
 // Global player variable declared but not initialised.
 var player;
-// Global pipes variable declared but not initialised.
-var pipes;
+// Global pipes variable initialised to an empty collection
+var pipes = [];
+// Physics constants of the game
+var gameGravity = 200;
+var gameSpeed = 200;
+var jumpPower = 200;
+
 // the interval (in seconds) at which new pipe columns are spawned
 var pipeInterval = 1.75;
 
@@ -26,26 +33,22 @@ function preload() {
 // Initialises the game. This function is only called once.
 function create() {
     // set the background colour of the scene
-    game.stage.setBackgroundColor("#F3D3A3");
-    // add welcome text
-    game.add.text(20, 20, "Welcome to my game", {font: "30px Arial", fill: "#FFFFFF"});
+    game.stage.setBackgroundColor("#BADA55");
     // add score text
     labelScore = game.add.text(20, 60, "0", {font: "30px Arial", fill: "#FFFFFF"});
     // initialise the player and associate it with playerImg
     player = game.add.sprite(80, 200, "playerImg");
-	 player.anchor.setTo(0.5, 0.5);
+    // Setting the player's anchor to center the rotation
+    player.anchor.setTo(0.5, 0.5);
     // Start the ARCADE physics engine.
     // ARCADE is the most basic physics engine in Phaser.
     game.physics.startSystem(Phaser.Physics.ARCADE);
     // enable physics for the player sprite
     game.physics.arcade.enable(player);
     // set the player's gravity
-    player.body.gravity.y = 200;
+    player.body.gravity.y = gameGravity;
     // associate spacebar with jump function
     game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(playerJump);
-    // create a group called 'pipes' to contain individual pipe elements that
-    // the player can interact with
-    pipes = game.add.group();
     // time loop for game to update
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, generatePipe);
 }
@@ -56,33 +59,26 @@ function update() {
     // (i.e. when player hits a pipe)
     game.physics.arcade.overlap(player, pipes, gameOver);
 
-	if(0 > player.body.y || player.body.y > 400){
-		gameOver();
-	}
+    if(0 > player.body.y || player.body.y > width){
+        gameOver();
+    }
 
-	player.rotation = (player.body.velocity.y / 200);
+    player.rotation = Math.atan(player.body.velocity.y / gameSpeed);
 }
-
 
 // Adds a pipe part to the pipes group
 function addPipeBlock(x, y) {
-    // add a new pipe part to the 'pipes' group
-    var pipe = pipes.create(x, y, "pipe");
+    var block = game.add.sprite(x, y, "pipe");
+     pipes.push(block);
     // enable physics engine for pipe
-    game.physics.arcade.enable(pipe);
+    game.physics.arcade.enable(block);
     // set the pipe's horizontal velocity to a negative value
     // (negative x value for velocity means movement will be towards left)
-    pipe.body.velocity.x = - 200;
+    block.body.velocity.x = -gameSpeed;
 }
 
 // Generate moving pipe
 function generatePipe() {
-
-    //RGU: as a bonus could we get them to have nicer pipes that have a "start" and "end"?
-    // like in the real flappy bird game ---] [---
-    // see http://flappybird.cambridgecoding.com/
-	 //RP: That'd be better suited with the smooth-pipe module
-
     // Generate  random integer between 1 and 5. This is the location of the
     // start point of the gap.
     var gapStart = game.rnd.integerInRange(1, 5);
@@ -91,7 +87,7 @@ function generatePipe() {
         // If the value of count is not equal to the gap start point
         // or end point, add the pipe image.
         if(count != gapStart && count != gapStart+1){
-            addPipeBlock(750, count * 50);
+            addPipeBlock(width, count * 50);
         }
     }
     // Increment the score each time a new pipe is generated.
@@ -100,7 +96,7 @@ function generatePipe() {
 
 function playerJump() {
     // the more negative the value the higher it jumps
-    player.body.velocity.y = -200;
+    player.body.velocity.y = - jumpPower;
 }
 
 // Function to change the score
