@@ -89,7 +89,7 @@ function checkBonus(bonusArray, bonusEffect) {
             // apply the bonus effect
             changeGravity(bonusEffect);
         });
-    }
+     }
 }
 
 // Adds a pipe part to the pipes group
@@ -171,6 +171,10 @@ function changeScore() {
     score++;
     // updates the score label
     labelScore.setText(score.toString());
+    // make the game a little bit harder for every point the player gets
+    if(player.body.x < (width / 2)) {
+        player.body.x += 5;
+    }
 }
 
 function gameOver() {

@@ -26,6 +26,10 @@ var pipeGap = 100;
 var balloons = [];
 var weights = [];
 
+// Global variables to store the stars
+var stars = [];
+var starHeight = 50;
+
 // Loads all resources for the game and gives them names.
 function preload() {
     // make image file available to game and associate with alias playerImg
@@ -38,6 +42,8 @@ function preload() {
     // make the bonus images available
     game.load.image("balloons","assets/balloons.png");
     game.load.image("weight","assets/weight.png");
+    // make the star available
+    game.load.image("star","assets/star.png");
 }
 
 // Initialises the game. This function is only called once.
@@ -76,6 +82,14 @@ function update() {
     checkBonus(balloons, -50);
     checkBonus(weights, 50);
 
+    for(var i=stars.length - 1; i>=0; i--){
+        game.physics.arcade.overlap(player,stars[i], function(){
+            stars[i].destroy();
+            stars.splice(i,1);
+            changeScore();
+        });
+    }
+
     player.rotation = Math.atan(player.body.velocity.y / gameSpeed);
 }
 
@@ -110,6 +124,13 @@ function addPipeEnd(x, y) {
     block.body.velocity.x = - gameSpeed;
 }
 
+function addStar(x,y) {
+   var star = game.add.sprite(x, y, "star");
+   stars.push(star);
+   game.physics.arcade.enable(star);
+   star.body.velocity.x = - gameSpeed;
+}
+
 function generate(){
     var diceRoll = game.rnd.integerInRange(1, 10);
     if(diceRoll===1){
@@ -131,12 +152,13 @@ function generatePipe() {
     for(var y=gapStart - 75; y>-50; y -= 50){
         addPipeBlock(width,y);
     }
+
+    addStar(width, gapStart + (gapSize / 2) - (starHeight / 2));
+
     addPipeEnd(width-5,gapStart+pipeGap);
     for(var y=gapStart + pipeGap + 25; y<height; y += 50){
         addPipeBlock(width,y);
     }
-    // Increment the score each time a new pipe is generated.
-    changeScore();
 }
 
 function generateBalloons(){

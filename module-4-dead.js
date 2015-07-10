@@ -21,10 +21,12 @@ var jumpPower = 200;
 // distance (in pixels) between ends of pipes.
 var pipeInterval = 1.75;
 var pipeGap = 100;
+var pipeWidth = 50;
 
 // Global variables to store the bonuses
 var balloons = [];
 var weights = [];
+var bonusWidth = 50;
 
 // Loads all resources for the game and gives them names.
 function preload() {
@@ -65,6 +67,13 @@ function create() {
 
 // This function updates the scene. It is called for every new frame.
 function update() {
+    // Clean the pipe array
+    for(var i=pipes.length - 1; i >= 0; i--) {
+        if(pipes[i].body.x - pipeWidth < 0){
+            pipes[i].destroy;
+            pipes.splice(i,1);
+        }
+    }
     // Call gameOver function when player overlaps with pipe
     // (i.e. when player hits a pipe)
     game.physics.arcade.overlap(player, pipes, gameOver);
@@ -81,14 +90,19 @@ function update() {
 
 function checkBonus(bonusArray, bonusEffect) {
     for(var i=bonusArray.length - 1; i>=0; i--){
-        game.physics.arcade.overlap(player,bonusArray[i], function(){
-            // destroy sprite
+        if(bonusArray[i].body.x - bonusWidth < 0){
             bonusArray[i].destroy();
-            // remove element from array
             bonusArray.splice(i,1);
-            // apply the bonus effect
-            changeGravity(bonusEffect);
-        });
+        } else {
+            game.physics.arcade.overlap(player,bonusArray[i], function(){
+                // destroy sprite
+                bonusArray[i].destroy();
+                // remove element from array
+                bonusArray.splice(i,1);
+                // apply the bonus effect
+                changeGravity(bonusEffect);
+            });
+        }
     }
 }
 
