@@ -89,7 +89,7 @@ function checkBonus(bonusArray, bonusEffect) {
             // apply the bonus effect
             changeGravity(bonusEffect);
         });
-     }
+    }
 }
 
 // Adds a pipe part to the pipes group
